@@ -1,0 +1,3 @@
+artifacts/logistic_regression_classifier.pkl
+artifacts/random_forest_classifier_classifier.pkl
+mlflow_db/
