@@ -1,4 +1,6 @@
 [core]
-    remote = gdrive_remote
-['remote "gdrive_remote"']
-    url = gdrive://1-skjyaVBK2XUt54IrZZe-oqNkHsucZ3q
+    remote = s3_remote
+['remote "s3_remote"']
+    url = s3://vinod-mlop-data/dvc-storage
+    access_key_id = <ACCESS_ID>
+    secret_access_key = <SECRET_KEY>
