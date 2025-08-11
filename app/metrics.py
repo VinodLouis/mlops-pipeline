@@ -5,12 +5,15 @@ metrics_router = APIRouter()
 conn = sqlite3.connect("logs/logs.db", check_same_thread=False)
 conn.row_factory = sqlite3.Row  # for dict-like access
 
+
 @metrics_router.get("/metrics")
 def get_metrics(
     limit: int = Query(25, ge=1),
     offset: int = Query(0, ge=0),
     status: str = Query(None, description="Filter by 'success' or 'error'"),
-    source: str = Query(None, description="Filter by request source (e.g., 'api', 'cli')")
+    source: str = Query(
+        None, description="Filter by request source (e.g., 'api', 'cli')"
+    ),
 ):
     # Total count
     cursor = conn.execute("SELECT COUNT(*) FROM logs")
@@ -57,5 +60,5 @@ def get_metrics(
         "offset": offset,
         "status_filter": status,
         "source_filter": source,
-        "logs": logs
+        "logs": logs,
     }

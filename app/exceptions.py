@@ -4,6 +4,7 @@ from fastapi.exceptions import RequestValidationError
 import json
 from app.logger import log_request
 
+
 async def handle_validation_error(request: Request, exc: RequestValidationError):
     input_data = await request.json() if request.method == "POST" else {}
     error_detail = exc.errors()
@@ -15,7 +16,7 @@ async def handle_validation_error(request: Request, exc: RequestValidationError)
         status="error",
         error=json.dumps(error_detail),
         source="validation",
-        details=None
+        details=None,
     )
 
     return JSONResponse(status_code=422, content={"detail": error_detail})
@@ -32,7 +33,7 @@ async def handle_http_exception(request: Request, exc: HTTPException):
         status="error",
         error=json.dumps(error_detail),
         source="auth" if exc.status_code in [401, 403] else "http",
-        details=None
+        details=None,
     )
 
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})

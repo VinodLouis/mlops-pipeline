@@ -19,8 +19,12 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # Save processed features with headers
-pd.DataFrame(X_train, columns=features.columns).to_csv(PROCESSED_PATH / "X_train.csv", index=False)
-pd.DataFrame(X_test, columns=features.columns).to_csv(PROCESSED_PATH / "X_test.csv", index=False)
+pd.DataFrame(X_train, columns=features.columns).to_csv(
+    PROCESSED_PATH / "X_train.csv", index=False
+)
+pd.DataFrame(X_test, columns=features.columns).to_csv(
+    PROCESSED_PATH / "X_test.csv", index=False
+)
 
 # Save labels with proper wrapping
 pd.DataFrame({"label": y_train}).to_csv(PROCESSED_PATH / "y_train.csv", index=False)

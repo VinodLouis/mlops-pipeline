@@ -9,25 +9,28 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
-import joblib
 from mlflow.tracking import MlflowClient
 from mlflow.exceptions import RestException
 import requests
 import re
+
 
 # Save model locally
 def save_model_locally(model, path):
     if os.path.exists(path):
         print(f"🧹 Removing existing model directory: {path}")
         shutil.rmtree(path)
-        
+
     mlflow.sklearn.save_model(model, path=path)
     print(f"Saved model locally to: {path}")
+
 
 # Validate inputs
 def validate_args(args):
     required_files = ["X_train.csv", "X_test.csv", "y_train.csv", "y_test.csv"]
-    missing = [f for f in required_files if not os.path.isfile(os.path.join(args.data_dir, f))]
+    missing = [
+        f for f in required_files if not os.path.isfile(os.path.join(args.data_dir, f))
+    ]
     if missing:
         print(f"Missing files in {args.data_dir}: {', '.join(missing)}")
         sys.exit(1)
@@ -43,16 +46,24 @@ def validate_args(args):
         try:
             response = requests.get(args.mlflow_uri)
             if response.status_code != 200:
-                print(f"Warning: MLflow URI responded with status {response.status_code}")
+                print(
+                    f"Warning: MLflow URI responded with status {response.status_code}"
+                )
         except Exception:
             print(f"Warning: Cannot reach MLflow URI: {args.mlflow_uri}")
 
     if not re.match(r"^[A-Za-z0-9_\-]+$", args.model_name):
-        print(f"Invalid model name: '{args.model_name}'. Use only letters, numbers, underscores, or hyphens.")
+        print(
+            f"Invalid model name: '{args.model_name}'. "
+            "Use only letters, numbers, underscores, or hyphens."
+        )
         sys.exit(3)
 
+
 # Register model only if using remote MLflow URI
-def register_model_if_remote(model_uri, args, mlflow_client, local_model_path, best_model_instance):
+def register_model_if_remote(
+    model_uri, args, mlflow_client, local_model_path, best_model_instance
+):
     if args.mlflow_uri.startswith("http"):
         try:
             try:
@@ -61,14 +72,19 @@ def register_model_if_remote(model_uri, args, mlflow_client, local_model_path, b
             except RestException:
                 print(f"Creating new registered model '{args.model_name}'")
 
-            model_version = mlflow.register_model(model_uri=model_uri, name=args.model_name)
-            print(f"Registered model: {model_version.name} version {model_version.version}")
+            model_version = mlflow.register_model(
+                model_uri=model_uri, name=args.model_name
+            )
+            print(
+                f"Registered model: {model_version.name} "
+                f"version {model_version.version}"
+            )
 
             if args.stage and args.stage != "None":
                 mlflow_client.transition_model_version_stage(
                     name=args.model_name,
                     version=model_version.version,
-                    stage=args.stage
+                    stage=args.stage,
                 )
                 print(f"Transitioned model to stage: {args.stage}")
 
@@ -82,7 +98,7 @@ def register_model_if_remote(model_uri, args, mlflow_client, local_model_path, b
     else:
         print("ℹSkipping model registration — not using remote MLflow URI.")
         save_model_locally(best_model_instance, local_model_path)
-        
+
 
 # Main training logic
 def train_and_register(args):
@@ -91,9 +107,11 @@ def train_and_register(args):
     output_dir = os.path.abspath(args.output_dir)
 
     if not args.mlflow_uri or args.mlflow_uri.strip() == "":
-        print("MLflow URI not provided. Please specify --mlflow-uri pointing to your MLflow server.")
+        print(
+            "MLflow URI not provided. "
+            "Please specify --mlflow-uri pointing to your MLflow server."
+        )
         sys.exit(4)
-
 
     mlflow.set_tracking_uri(args.mlflow_uri)
     mlflow.set_experiment(args.experiment_name)
@@ -115,8 +133,8 @@ def train_and_register(args):
     model_configs = {
         "logistic_regression": LogisticRegression(max_iter=500),
         "random_forest_classifier": RandomForestClassifier(
-            n_estimators=100, random_state=42, min_samples_leaf=1, max_features='sqrt'
-        )
+            n_estimators=100, random_state=42, min_samples_leaf=1, max_features="sqrt"
+        ),
     }
 
     run_infos = []
@@ -144,31 +162,69 @@ def train_and_register(args):
             save_model_locally(model_instance, local_model_path)
             print(f"Saved local model: {local_model_path}")
 
-    best_model_name, best_accuracy, best_run_id, best_model_instance = sorted(run_infos, key=lambda x: x[1], reverse=True)[0]
+    best_model_name, best_accuracy, best_run_id, best_model_instance = sorted(
+        run_infos, key=lambda x: x[1], reverse=True
+    )[0]
     model_uri = f"runs:/{best_run_id}/model"
     print(f"Best model: {best_model_name} with accuracy {best_accuracy:.4f}")
     print(f"Model URI: {model_uri}")
 
     local_model_path = os.path.join(output_dir, args.model_name)
-    
+
     register_model_if_remote(
         model_uri=model_uri,
         args=args,
         mlflow_client=mlflow_client,
         local_model_path=local_model_path,
-        best_model_instance=best_model_instance
+        best_model_instance=best_model_instance,
     )
+
 
 # CLI entry point
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Train and register Iris classifier with MLflow (pre-split version)")
-    parser.add_argument("--mlflow-uri", type=str, default="", help="MLflow tracking URI (default: local mlruns folder)")
-    parser.add_argument("--experiment-name", type=str, default="Iris_Classification", help="MLflow experiment name")
-    parser.add_argument("--model-name", type=str, default="iris_classifier", help="Registered model name")
-    parser.add_argument("--data-dir", type=str, required=True, help="Directory containing X_train.csv, X_test.csv, y_train.csv, y_test.csv")
-    parser.add_argument("--output-dir", type=str, default="./artifacts", help="Directory to save local model")
-    parser.add_argument("--scale", action="store_true", help="Apply StandardScaler to features")
-    parser.add_argument("--stage", type=str, default="None", choices=["None", "Staging", "Production"], help="Optional stage to transition model")
+    parser = argparse.ArgumentParser(
+        description="Train and register Iris classifier with MLflow (pre-split version)"
+    )
+    parser.add_argument(
+        "--mlflow-uri",
+        type=str,
+        default="",
+        help="MLflow tracking URI (default: local mlruns folder)",
+    )
+    parser.add_argument(
+        "--experiment-name",
+        type=str,
+        default="Iris_Classification",
+        help="MLflow experiment name",
+    )
+    parser.add_argument(
+        "--model-name",
+        type=str,
+        default="iris_classifier",
+        help="Registered model name",
+    )
+    parser.add_argument(
+        "--data-dir",
+        type=str,
+        required=True,
+        help="Directory containing X_train.csv, X_test.csv, y_train.csv, y_test.csv",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default="./artifacts",
+        help="Directory to save local model",
+    )
+    parser.add_argument(
+        "--scale", action="store_true", help="Apply StandardScaler to features"
+    )
+    parser.add_argument(
+        "--stage",
+        type=str,
+        default="None",
+        choices=["None", "Staging", "Production"],
+        help="Optional stage to transition model",
+    )
 
     args = parser.parse_args()
     train_and_register(args)

@@ -3,9 +3,16 @@ import mlflow.pyfunc
 import traceback
 import mlflow
 
-from app.config import MLFLOW_TRACKING_URI, MODEL_STAGE, MODEL_NAME, MODEL_SOURCE, MODEL_VERSION
+from app.config import (
+    MLFLOW_TRACKING_URI,
+    MODEL_STAGE,
+    MODEL_NAME,
+    MODEL_SOURCE,
+    MODEL_VERSION,
+)
 
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+
 
 def load_model():
     print("Calling load_model")
@@ -30,11 +37,12 @@ def load_model():
 
         return mlflow.pyfunc.load_model(model_uri)
 
-    except Exception as e:
+    except Exception:
         print("Failed to load from MLflow registry")
         traceback.print_exc()
         print("Falling back to local model...")
         return load_local_model()
+
 
 def load_local_model():
     path = f"models/{MODEL_NAME}"
@@ -47,6 +55,7 @@ def load_local_model():
         elif os.path.isfile(path):
             print("Detected raw pickle file")
             import pickle
+
             with open(path, "rb") as f:
                 return pickle.load(f)
         else:
@@ -61,6 +70,7 @@ def load_local_model():
         traceback.print_exc()
 
     return None
+
 
 def predict(model, features):
     if model is None:

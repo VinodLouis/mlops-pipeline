@@ -3,6 +3,7 @@ from fastapi import Request, HTTPException
 
 from app.config import API_TOKEN
 
+
 # Dummy Auth
 def verify_token(request: Request):
     auth = request.headers.get("Authorization")

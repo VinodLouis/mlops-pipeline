@@ -10,7 +10,7 @@ MODEL_STAGE = os.getenv("MODEL_STAGE", "Staging")
 MODEL_SOURCE = os.getenv("MODEL_SOURCE", None)
 MODEL_VERSION = os.getenv("MODEL_VERSION", None)
 
-#token 
+# token
 API_TOKEN = os.getenv("API_TOKEN", "supersecret")
 
 

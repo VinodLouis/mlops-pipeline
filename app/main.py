@@ -20,11 +20,13 @@ app.include_router(health_router)
 
 model = load_model()
 
+
 class Input(BaseModel):
     sepal_length: float
     sepal_width: float
     petal_length: float
     petal_width: float
+
 
 @app.post("/predict")
 async def predict_endpoint(data: Input, request: Request):
@@ -41,11 +43,13 @@ async def predict_endpoint(data: Input, request: Request):
     except Exception as e:
         status = "error"
         error = str(e)
-        details = json.dumps({
-            "type": type(e).__name__,
-            "message": str(e),
-            "traceback": traceback.format_exc()
-        })
+        details = json.dumps(
+            {
+                "type": type(e).__name__,
+                "message": str(e),
+                "traceback": traceback.format_exc(),
+            }
+        )
 
     # Always log the request
     log_request(
@@ -55,7 +59,7 @@ async def predict_endpoint(data: Input, request: Request):
         status=status,
         error=error,
         source="prediction",
-        details=details
+        details=details,
     )
 
     if status == "error":
