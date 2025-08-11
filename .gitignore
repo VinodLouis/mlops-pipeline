@@ -3,3 +3,6 @@ artifacts/random_forest_classifier_classifier/
 mlflow_db/
 logs/
 .DS_Store
+**/__pycache__/
+*.py[cod]
+.coverage
