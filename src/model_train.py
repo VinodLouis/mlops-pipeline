@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import argparse
 import pandas as pd
@@ -16,7 +17,11 @@ import re
 
 # Save model locally
 def save_model_locally(model, path):
-    joblib.dump(model, path)
+    if os.path.exists(path):
+        print(f"🧹 Removing existing model directory: {path}")
+        shutil.rmtree(path)
+        
+    mlflow.sklearn.save_model(model, path=path)
     print(f"Saved model locally to: {path}")
 
 # Validate inputs
@@ -77,6 +82,7 @@ def register_model_if_remote(model_uri, args, mlflow_client, local_model_path, b
     else:
         print("ℹSkipping model registration — not using remote MLflow URI.")
         save_model_locally(best_model_instance, local_model_path)
+        
 
 # Main training logic
 def train_and_register(args):
@@ -134,8 +140,8 @@ def train_and_register(args):
             print(f"Logged model to run: {run.info.run_id}")
             run_infos.append((model_name, acc, run.info.run_id, model_instance))
 
-            local_model_path = os.path.join(output_dir, f"{model_name}_classifier.pkl")
-            joblib.dump(model_instance, local_model_path)
+            local_model_path = os.path.join(output_dir, f"{model_name}_classifier")
+            save_model_locally(model_instance, local_model_path)
             print(f"Saved local model: {local_model_path}")
 
     best_model_name, best_accuracy, best_run_id, best_model_instance = sorted(run_infos, key=lambda x: x[1], reverse=True)[0]
@@ -143,7 +149,7 @@ def train_and_register(args):
     print(f"Best model: {best_model_name} with accuracy {best_accuracy:.4f}")
     print(f"Model URI: {model_uri}")
 
-    local_model_path = os.path.join(output_dir, "best_regression.pkl")
+    local_model_path = os.path.join(output_dir, args.model_name)
     
     register_model_if_remote(
         model_uri=model_uri,
@@ -158,7 +164,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train and register Iris classifier with MLflow (pre-split version)")
     parser.add_argument("--mlflow-uri", type=str, default="", help="MLflow tracking URI (default: local mlruns folder)")
     parser.add_argument("--experiment-name", type=str, default="Iris_Classification", help="MLflow experiment name")
-    parser.add_argument("--model-name", type=str, default="IrisClassifier", help="Registered model name")
+    parser.add_argument("--model-name", type=str, default="iris_classifier", help="Registered model name")
     parser.add_argument("--data-dir", type=str, required=True, help="Directory containing X_train.csv, X_test.csv, y_train.csv, y_test.csv")
     parser.add_argument("--output-dir", type=str, default="./artifacts", help="Directory to save local model")
     parser.add_argument("--scale", action="store_true", help="Apply StandardScaler to features")

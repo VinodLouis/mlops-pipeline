@@ -10,7 +10,7 @@ PROCESSED_PATH.mkdir(parents=True, exist_ok=True)
 df = pd.read_csv(DATA_PATH)
 
 # Split features and labels
-features = df.drop(columns=["Species"])
+features = df.drop(columns=["Id", "Species"])
 labels = df["Species"]
 
 # Train-test split
