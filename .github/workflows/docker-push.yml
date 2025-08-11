@@ -62,5 +62,5 @@ jobs:
           context: .
           push: true
           tags: |
-            vinodmlops/iris:latest
-            vinodmlops/iris:${{ env.VERSION }}
+            vinodlouis/iris:latest
+            vinodlouis/iris:${{ env.VERSION }}
