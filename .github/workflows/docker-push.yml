@@ -30,11 +30,6 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Ensure version.txt is tracked
-        run: |
-          git add version.txt pyproject.toml
-          git commit -m "chore: ensure version tracking [skip ci]" || echo "No changes to commit"
-
       - name: Bump minor version
         id: bump
         run: |
@@ -42,6 +37,8 @@ jobs:
           VERSION=$(cat version.txt)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+          git add version.txt pyproject.toml
+          git commit -m "chore: bump version to $VERSION [skip ci]" || echo "No changes to commit"
           git tag v$VERSION
           git push origin HEAD --tags
 
