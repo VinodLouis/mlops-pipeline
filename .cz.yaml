@@ -1,5 +1,0 @@
-name: cz_conventional_commits
-version: 1.2.3
-version_files:
-  - version.txt
-tag_format: v$version
