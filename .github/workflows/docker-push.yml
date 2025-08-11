@@ -32,7 +32,7 @@ jobs:
 
       - name: Bump minor version
         run: |
-          cz bump --increment minor --yes --config .cz.yaml
+          cz bump --increment minor --yes -- --config .cz.yaml
           VERSION=$(cat version.txt)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
