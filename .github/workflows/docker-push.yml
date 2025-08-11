@@ -14,6 +14,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2 # Needed to detect merge commits
+
+      - name: Detect merge commit
+        id: merge_check
+        run: |
+          MERGE_COMMIT=$(git log -1 --pretty=%P | wc -w)
+          if [ "$MERGE_COMMIT" -lt 2 ]; then
+            echo "Not a merge commit. Skipping."
+            exit 0
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -29,6 +40,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
 
       - name: Bump minor version
         id: bump
@@ -36,9 +48,7 @@ jobs:
           cz bump --increment minor --yes
           VERSION=$(cat version.txt)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          git add version.txt pyproject.toml
-          git commit -m "chore: bump version to $VERSION [skip ci]" || echo "No changes to commit"
-          git push origin HEAD --tags
+          git push origin HEAD --tags || echo "Nothing to push"
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
