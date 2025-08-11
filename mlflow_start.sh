@@ -30,16 +30,16 @@ fi
 
 # === LOGIN (Optional) ===
 if [ -n "$CR_PAT" ]; then
-  echo "🔐 Logging into GHCR..."
+  echo "Logging into GHCR..."
   echo "$CR_PAT" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
 fi
 
-echo "📦 Pulling MLflow image: $MLFLOW_IMAGE"
+echo "Pulling MLflow image: $MLFLOW_IMAGE"
 docker pull "$MLFLOW_IMAGE"
 
 echo "$HOME"
 
-echo "🚀 Starting MLflow server..."
+echo "Starting MLflow server..."
 docker run -d --rm \
   --name "$CONTAINER_NAME" \
   -p "$HOST_PORT:$CONTAINER_PORT" \
@@ -53,8 +53,8 @@ docker run -d --rm \
     --host 0.0.0.0 \
     --port "$CONTAINER_PORT"
 
-echo "⏳ Waiting 2–3s..."
-sleep 3
-echo "📝 Logs:"
+echo "Waiting 2–3s..."
+sleep 15
+echo "Logs:"
 docker logs "$CONTAINER_NAME" --tail 200
-echo "🌐 UI: http://localhost:$HOST_PORT"
+echo "UI: http://localhost:$HOST_PORT"
