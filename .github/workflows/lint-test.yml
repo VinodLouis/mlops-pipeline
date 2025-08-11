@@ -32,6 +32,12 @@ jobs:
       - name: Create data mock
         run: python util/populate_rawdata.py
 
-      - name: 🧪 Run tests with PYTHONPATH
+      - name: Create dummy processed files
+        run: |
+          mkdir -p data/processed
+          touch data/processed/X_train.csv
+          touch data/processed/X_test.csv
+
+      - name: Run tests with PYTHONPATH
         run: |
           PYTHONPATH=. pytest tests/ --disable-warnings --maxfail=1 --tb=short
