@@ -32,13 +32,8 @@ jobs:
       - name: Create data mock
         run: python util/populate_rawdata.py
 
-      - name: Create dummy processed files
-        run: |
-          mkdir -p data/processed
-          touch data/processed/X_train.csv
-          touch data/processed/X_test.csv
-          touch data/processed/y_train.csv
-          touch data/processed/y_test.csv
+      - name: Generate preprocessing data
+        run: python src/preprocess_data.py
 
       - name: Run tests with PYTHONPATH
         run: |
