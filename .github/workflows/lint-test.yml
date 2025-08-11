@@ -26,6 +26,9 @@ jobs:
     - name: Lint with flake8
       run: flake8 src/ app/ 
 
+    - name: 🗂️ Create logs directory
+      run: mkdir -p logs
+
     - name: 🧪 Run tests with PYTHONPATH
       run: |
         PYTHONPATH=. pytest tests/ --disable-warnings --maxfail=1 --tb=short
