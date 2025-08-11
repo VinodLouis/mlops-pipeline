@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.9.2
+    container_name: mlflow-server
+    ports:
+      - '5002:5000'
+    volumes:
+      - ./mlflow_db:/mlflow/db
+      - ~/.aws:/root/.aws:ro
+    environment:
+      - AWS_REGION=eu-north-1
+    command: >
+      mlflow server
+      --backend-store-uri sqlite:////mlflow/db/mlflow.db
+      --default-artifact-root s3://vinod-mlop-data/mlflow-artifacts
+      --host 0.0.0.0
+      --port 5000
+
+  fastapi:
+    build: .
+    ports:
+      - '8000:8000'
+    depends_on:
+      - mlflow
+    volumes:
+      - ~/.aws:/root/.aws
+      - ./logs:/app/logs
+      - ./artifacts:/app/models

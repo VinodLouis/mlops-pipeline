@@ -1,3 +1,5 @@
 artifacts/logistic_regression_classifier/
 artifacts/random_forest_classifier_classifier/
 mlflow_db/
+logs/
+.DS_Store
