@@ -2,33 +2,36 @@ name: Lint and Test
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-        
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest fastapi pydantic uvicorn dotenv httpx mlflow pytest-asyncio
-        
-    - name: Lint with flake8
-      run: flake8 src/ app/ 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
 
-    - name: 🗂️ Create logs directory
-      run: mkdir -p logs
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest fastapi pydantic uvicorn dotenv httpx mlflow pytest-asyncio
 
-    - name: 🧪 Run tests with PYTHONPATH
-      run: |
-        PYTHONPATH=. pytest tests/ --disable-warnings --maxfail=1 --tb=short
+      - name: Lint with flake8
+        run: flake8 src/ app/
+
+      - name: Create logs directory
+        run: mkdir -p logs
+
+      - name: Create data mock
+        run: python util/populate_rawdata.py
+
+      - name: 🧪 Run tests with PYTHONPATH
+        run: |
+          PYTHONPATH=. pytest tests/ --disable-warnings --maxfail=1 --tb=short
