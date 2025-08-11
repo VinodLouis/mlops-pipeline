@@ -37,6 +37,8 @@ jobs:
           mkdir -p data/processed
           touch data/processed/X_train.csv
           touch data/processed/X_test.csv
+          touch data/processed/y_train.csv
+          touch data/processed/y_test.csv
 
       - name: Run tests with PYTHONPATH
         run: |
