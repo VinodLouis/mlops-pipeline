@@ -8,30 +8,6 @@
 
 A production-ready MLOps pipeline for training, tracking, registering, and serving machine learning models. This project demonstrates best practices in ML operations using MLflow for experiment tracking, Docker for containerization, and FastAPI for model serving.
 
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Architecture](#architecture)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Project Structure](#project-structure)
-- [Quick Start](#quick-start)
-- [Detailed Usage](#detailed-usage)
-- [API Documentation](#api-documentation)
-- [Monitoring and Metrics](#monitoring-and-metrics)
-- [Troubleshooting](#troubleshooting)
-- [Testing](#testing)
-- [FAQ](#frequently-asked-questions-faq)
-- [Security Considerations](#security-considerations)
-- [Production Deployment](#production-deployment)
-- [Performance Optimization](#performance-optimization)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
-- [Author](#author)
-- [Support](#support)
-
 ## 🎯 Overview
 
 This MLOps pipeline provides a complete, end-to-end workflow for machine learning model development and deployment. Built as a demonstration of production-ready ML engineering practices, it uses the classic **Iris dataset** for classification as an example use case.
